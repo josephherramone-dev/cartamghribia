@@ -43,6 +43,7 @@ function newGame(players, rng = Math.random) {
     turn: 0,
     pendingDraw: 0, // accumulated cards from stacked 2s
     winner: null,
+    lastAction: null, // { type: 'play' | 'draw', playerId, count? } — lets clients animate
     log: [],
   };
   for (let r = 0; r < HAND_SIZE; r++) {
@@ -123,6 +124,7 @@ function playCard(state, playerId, cardId, chosenSuit) {
     msg += ` and changed the suit to ${chosenSuit}`;
   }
   state.log.push(msg + '.');
+  state.lastAction = { type: 'play', playerId, cardId };
 
   if (player.hand.length === 0) {
     state.winner = player.id;
@@ -139,12 +141,53 @@ function drawCard(state, playerId, rng = Math.random) {
     const n = drawCards(state, player, state.pendingDraw, rng);
     state.log.push(`${player.name} drew ${n} cards.`);
     state.pendingDraw = 0;
+    state.lastAction = { type: 'draw', playerId, count: n };
   } else {
     const n = drawCards(state, player, 1, rng);
     state.log.push(n ? `${player.name} drew a card.` : `${player.name} passed (no cards left to draw).`);
+    state.lastAction = { type: 'draw', playerId, count: n };
   }
   state.turn = nextIndex(state);
   return state;
+}
+
+/**
+ * Decide a move for a computer player.
+ * level 'easy' plays a random legal card; 'hard' plays strategically.
+ * Returns { action: 'play', cardId, suit? } or { action: 'draw' }.
+ */
+function chooseBotMove(state, playerId, level = 'hard', rng = Math.random) {
+  const me = state.players.find((p) => p.id === playerId);
+  const legal = me.hand.filter((c) => canPlay(state, c));
+  if (legal.length === 0) return { action: 'draw' };
+
+  const bestSuit = (hand) => {
+    const counts = {};
+    for (const c of hand) if (c.rank !== 7) counts[c.suit] = (counts[c.suit] || 0) + 1;
+    const ranked = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    return ranked.length ? ranked[0][0] : SUITS[Math.floor(rng() * SUITS.length)];
+  };
+  const move = (card) => {
+    const rest = me.hand.filter((c) => c !== card);
+    return card.rank === 7
+      ? { action: 'play', cardId: card.id, suit: level === 'easy' ? SUITS[Math.floor(rng() * 4)] : bestSuit(rest) }
+      : { action: 'play', cardId: card.id };
+  };
+
+  if (level === 'easy') return move(legal[Math.floor(rng() * legal.length)]);
+
+  const nextCount = state.players[nextIndex(state)].hand.length;
+  const score = (card) => {
+    const rest = me.hand.filter((c) => c !== card);
+    let s = rest.filter((c) => c.suit === card.suit).length * 2; // keep options to follow
+    s += rest.filter((c) => c.rank === card.rank).length;         // and to switch suit by rank
+    if (card.rank === 2) s += nextCount <= 2 ? 10 : 1;            // attack a player close to winning
+    if (card.rank === 1) s += nextCount <= 2 ? 8 : 1;
+    if (card.rank === 7) s -= me.hand.length === 1 ? -100 : 20;   // save the wild card for later
+    return s;
+  };
+  const sorted = legal.slice().sort((a, b) => score(b) - score(a));
+  return move(sorted[0]);
 }
 
 /** What one player is allowed to see. */
@@ -163,11 +206,13 @@ function viewFor(state, playerId) {
     pendingDraw: state.pendingDraw,
     drawPileCount: state.drawPile.length,
     winner: state.winner,
+    lastAction: state.lastAction,
+    seq: state.log.length, // increases with every event
     log: state.log.slice(-12),
   };
 }
 
 module.exports = {
   SUITS, RANKS, HAND_SIZE, MIN_PLAYERS, MAX_PLAYERS,
-  GameError, createDeck, shuffle, newGame, canPlay, playCard, drawCard, viewFor, topCard,
+  GameError, createDeck, shuffle, newGame, canPlay, playCard, drawCard, viewFor, topCard, chooseBotMove,
 };

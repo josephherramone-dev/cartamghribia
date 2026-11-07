@@ -103,3 +103,35 @@ test('view hides other hands', () => {
   assert.strictEqual(v.hand.length, 4);
   assert.ok(v.players.every((p) => !('hand' in p)));
 });
+
+test('hard bot answers a pending 2 with a 2', () => {
+  const s = setup({ top: card(2, 'kass'), hands: [[card(5, 'kass'), card(2, 'dheb')]] });
+  s.pendingDraw = 2;
+  assert.deepStrictEqual(g.chooseBotMove(s, 'a', 'hard'), { action: 'play', cardId: '2-dheb' });
+});
+
+test('hard bot saves the 7 and draws when nothing is legal', () => {
+  const s = setup({ top: card(5, 'kass'), hands: [[card(7, 'dheb'), card(3, 'kass'), card(4, 'kass')]] });
+  assert.strictEqual(g.chooseBotMove(s, 'a', 'hard').cardId, '3-kass');
+  const t = setup({ top: card(5, 'kass'), hands: [[card(4, 'syouf')]] });
+  assert.deepStrictEqual(g.chooseBotMove(t, 'a', 'hard'), { action: 'draw' });
+});
+
+test('hard bot picks its strongest suit with a 7', () => {
+  const s = setup({ top: card(5, 'kass'), hands: [[card(7, 'dheb'), card(3, 'syouf'), card(4, 'syouf')]] });
+  assert.deepStrictEqual(g.chooseBotMove(s, 'a', 'hard'), { action: 'play', cardId: '7-dheb', suit: 'syouf' });
+});
+
+test('bots always make legal moves through a full game', () => {
+  for (let n = 0; n < 50; n++) {
+    const s = g.newGame(players);
+    let guard = 0;
+    while (!s.winner && guard++ < 2000) {
+      const id = s.players[s.turn].id;
+      const m = g.chooseBotMove(s, id, n % 2 ? 'easy' : 'hard');
+      if (m.action === 'play') g.playCard(s, id, m.cardId, m.suit); else g.drawCard(s, id);
+    }
+    const total = s.drawPile.length + s.discard.length + s.players.reduce((k, p) => k + p.hand.length, 0);
+    assert.strictEqual(total, 40);
+  }
+});

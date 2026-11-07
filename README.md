@@ -9,7 +9,10 @@ npm install
 npm start
 ```
 
-Open http://localhost:3000, create a room and share the invite link (2–4 players).
+Open http://localhost:3000, then either:
+
+- **Play vs Computer**: pick 1–3 opponents and a level (Easy / Hard), or
+- **Play with Friends**: create a room and share the invite link (2–4 players). The host can fill empty seats with computer players.
 
 ## Rules
 
@@ -23,8 +26,10 @@ Open http://localhost:3000, create a room and share the invite link (2–4 playe
 ## Project layout
 
 - `server/game.js`: the rules engine (pure functions, unit tested)
-- `server/index.js`: Express + Socket.IO server, rooms, reconnection
-- `public/`: browser client (HTML/CSS/JS, no build step)
+- `server/game.js` also contains the computer player (`chooseBotMove`)
+- `server/index.js`: Express + Socket.IO server, rooms, bots, reconnection
+- `public/cards.js`: card artwork (SVG, Spanish suits), avatars, sounds (Hijaz maqam)
+- `public/client.js`, `public/style.css`, `public/index.html`: the browser client (no build step)
 - `test/`: rules tests, run with `npm test`
 
 The server is authoritative: it validates every move and only sends each player their own hand.
