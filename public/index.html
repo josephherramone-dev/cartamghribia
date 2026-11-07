@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Carta Mghribia — Hezz2 Online</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Carta Mghribia <span>Hezz2</span></h1>
+  </header>
+
+  <!-- Home -->
+  <section id="home" class="screen">
+    <div class="panel">
+      <label>Your name <input id="name" maxlength="16" placeholder="Smiytek"></label>
+      <button id="create">Create room</button>
+      <div class="or">or</div>
+      <div class="row">
+        <input id="code" maxlength="5" placeholder="ROOM CODE">
+        <button id="join">Join</button>
+      </div>
+      <details class="rules">
+        <summary>Rules</summary>
+        <ul>
+          <li>Each player gets 4 cards. Match the top card's <b>suit</b> or <b>number</b>.</li>
+          <li>Can't play? Draw one card and your turn ends.</li>
+          <li><b>2</b> — next player draws 2, unless they answer with another 2 (they stack!).</li>
+          <li><b>1</b> — skips the next player.</li>
+          <li><b>7</b> — wild: play it on anything and choose the next suit.</li>
+          <li>First to empty their hand wins.</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <!-- Lobby -->
+  <section id="lobby" class="screen hidden">
+    <div class="panel">
+      <h2>Room <span id="lobby-code"></span></h2>
+      <p class="hint">Share this link with your friends:</p>
+      <div class="row"><input id="invite" readonly><button id="copy">Copy</button></div>
+      <ul id="lobby-players"></ul>
+      <button id="start">Start game</button>
+      <p id="lobby-wait" class="hint">Waiting for the host to start…</p>
+      <button id="leave" class="secondary">Leave</button>
+    </div>
+  </section>
+
+  <!-- Game -->
+  <section id="game" class="screen hidden">
+    <div id="opponents"></div>
+    <div id="table">
+      <div id="draw-pile" class="card back" title="Draw a card"><span id="draw-count"></span></div>
+      <div id="top-card"></div>
+      <div id="status">
+        <div id="turn-label"></div>
+        <div id="suit-label"></div>
+        <div id="pending-label"></div>
+      </div>
+    </div>
+    <div id="hand"></div>
+    <div id="side">
+      <ul id="log"></ul>
+      <ul id="chat"></ul>
+      <form id="chat-form"><input id="chat-input" maxlength="200" placeholder="Say something…" autocomplete="off"></form>
+    </div>
+  </section>
+
+  <!-- Suit picker for 7 -->
+  <div id="suit-picker" class="modal hidden">
+    <div class="panel">
+      <h3>Choose a suit</h3>
+      <div id="suit-options"></div>
+      <button id="suit-cancel" class="secondary">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Winner -->
+  <div id="winner" class="modal hidden">
+    <div class="panel">
+      <h2 id="winner-text"></h2>
+      <button id="rematch">Play again</button>
+      <p id="rematch-wait" class="hint">Waiting for the host…</p>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+</body>
+</html>
