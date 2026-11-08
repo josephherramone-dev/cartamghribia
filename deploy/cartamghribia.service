@@ -1,0 +1,17 @@
+# systemd service: copy to /etc/systemd/system/cartamghribia.service
+[Unit]
+Description=Carta Mghribia (Hezz 2) game server
+After=network.target
+
+[Service]
+Type=simple
+User=cartamghribia
+WorkingDirectory=/opt/cartamghribia
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/node server/index.js
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

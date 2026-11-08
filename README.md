@@ -14,6 +14,10 @@ Open http://localhost:3000, then either:
 - **Play vs Computer**: pick 1–3 opponents and a level (Easy / Hard), or
 - **Play with Friends**: create a room and share the invite link (2–4 players). The host can fill empty seats with computer players.
 
+## Put it online
+
+See [DEPLOY.md](DEPLOY.md) for hosting on a VPS (Node + nginx + HTTPS, or Docker).
+
 ## Rules
 
 - Each player gets 4 cards. Play a card matching the top card's **suit** or **number**.
@@ -28,7 +32,7 @@ Open http://localhost:3000, then either:
 - `server/game.js`: the rules engine (pure functions, unit tested)
 - `server/game.js` also contains the computer player (`chooseBotMove`)
 - `server/index.js`: Express + Socket.IO server, rooms, bots, reconnection
-- `public/cards.js`: card artwork (SVG, Spanish suits), avatars, sounds (Hijaz maqam)
+- `public/cards.js`: card artwork (SVG, traditional Spanish-deck style), avatars, sounds (Hijaz maqam)
 - `public/client.js`, `public/style.css`, `public/index.html`: the browser client (no build step)
 - `test/`: rules tests, run with `npm test`
 

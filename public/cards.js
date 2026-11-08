@@ -1,10 +1,10 @@
 /* Card artwork, avatars and sounds — shared by the client. */
 (function () {
   const SUITS = {
-    dheb:   { label: 'Dheb',   ar: 'ذهب',   color: '#a87510' },
-    kass:   { label: 'Kass',   ar: 'كاس',   color: '#b3202a' },
-    syouf:  { label: 'Syouf',  ar: 'سيوف',  color: '#1f4e8c' },
-    zrawet: { label: 'Zrawet', ar: 'زرواط', color: '#2f6b2f' },
+    dheb:   { label: 'Dheb',   ar: 'ذهب',   color: '#b8860b', gaps: 0 },
+    kass:   { label: 'Kass',   ar: 'كاس',   color: '#d4231c', gaps: 1 },
+    syouf:  { label: 'Syouf',  ar: 'سيوف',  color: '#1d5bb5', gaps: 2 },
+    zrawet: { label: 'Zrawet', ar: 'زرواط', color: '#2f8f3e', gaps: 3 },
   };
   const FACES = {
     10: { label: 'SOTA', ar: 'صوطة' },
@@ -12,61 +12,185 @@
     12: { label: 'REY', ar: 'ري' },
   };
 
-  // Pip positions (x, y) in the 100×150 card for ranks 1–7
+  // Flat traditional palette
+  const R = '#d4231c', B = '#1d5bb5', Y = '#f4c20d', G = '#2f8f3e', K = '#1a1a1a', S = '#f7d2b0', W = '#ffffff', BR = '#8a5a2b';
+  const CLUB_COLORS = [R, B, G];
+  const LONG = { syouf: true, zrawet: true };
+
+  // Coins and cups: pip centres (x, y) and size, 100×150 card
   const PIPS = {
-    1: [[50, 75]],
-    2: [[50, 46], [50, 104]],
-    3: [[50, 40], [50, 75], [50, 110]],
-    4: [[33, 48], [67, 48], [33, 102], [67, 102]],
-    5: [[33, 45], [67, 45], [50, 75], [33, 105], [67, 105]],
-    6: [[33, 42], [67, 42], [33, 75], [67, 75], [33, 108], [67, 108]],
-    7: [[33, 40], [67, 40], [50, 58], [33, 80], [67, 80], [33, 110], [67, 110]],
+    1: { size: 62, at: [[50, 76]] },
+    2: { size: 36, at: [[50, 44], [50, 108]] },
+    3: { size: 32, at: [[50, 38], [50, 76], [50, 114]] },
+    4: { size: 30, at: [[32, 46], [68, 46], [32, 106], [68, 106]] },
+    5: { size: 29, at: [[32, 42], [68, 42], [50, 76], [32, 110], [68, 110]] },
+    6: { size: 27, at: [[32, 40], [68, 40], [32, 76], [68, 76], [32, 112], [68, 112]] },
+    7: { size: 26, at: [[32, 38], [68, 38], [50, 57], [32, 76], [68, 76], [32, 114], [68, 114]] },
   };
 
   const use = (id, x, y, size) =>
     `<use href="#${id}" x="${x - size / 2}" y="${y - size / 2}" width="${size}" height="${size}"/>`;
-
-  function faceArt(rank, suit, color) {
-    const arch = `<path d="M24 128 V62 Q24 40 50 30 Q76 40 76 62 V128 Z" fill="${color}" fill-opacity=".09" stroke="${color}" stroke-width="1.4"/>
-      <path d="M29 128 V64 Q29 45 50 36 Q71 45 71 64 V128" fill="none" stroke="#d6a93a" stroke-width=".9" stroke-dasharray="3 2"/>`;
-    let figure = '';
-    if (rank === 12) {
-      figure = `<path d="M36 58 L39 44 L45 52 L50 40 L55 52 L61 44 L64 58 Z" fill="url(#g-gold)" stroke="#7a5a0c" stroke-width="1"/>
-        <rect x="36" y="58" width="28" height="4" rx="1" fill="url(#g-gold)" stroke="#7a5a0c" stroke-width=".8"/>
-        <circle cx="50" cy="51" r="2" fill="${color}"/>`;
-    } else if (rank === 11) {
-      figure = `<text x="50" y="66" text-anchor="middle" font-size="30" fill="${color}" font-family="serif">♞</text>`;
-    } else {
-      figure = `<circle cx="50" cy="45" r="6" fill="${color}" fill-opacity=".85"/>
-        <path d="M38 66 Q50 50 62 66 Z" fill="${color}" fill-opacity=".85"/>
-        <path d="M43 40 Q50 33 57 40" stroke="url(#g-gold)" stroke-width="2.5" fill="none"/>`;
-    }
-    const f = FACES[rank];
-    return `${arch}${figure}${use('s-' + suit, 50, 92, 34)}
-      <text x="50" y="121" text-anchor="middle" font-size="${f.label.length > 5 ? 6.6 : 8.5}" font-family="Reem Kufi, sans-serif" fill="${color}" letter-spacing="${f.label.length > 5 ? .4 : 1}">${f.label}</text>`;
+  // Swords and clubs are tall (16:52); placed by centre, height and angle
+  function long(suit, x, y, h, angle = 0, i = 0) {
+    const w = h * 16 / 52;
+    // short clubs are drawn chunkier, like the printed deck
+    const widen = suit === 'zrawet' && h < 60 ? ' scale(1.55 1)' : '';
+    const club = suit === 'zrawet' ? ` style="--club:${CLUB_COLORS[i % 3]}"` : '';
+    return `<use href="#s-${suit}" x="${-w / 2}" y="${-h / 2}" width="${w}" height="${h}" transform="translate(${x} ${y}) rotate(${angle})${widen}"${club}/>`;
   }
 
-  /** Face-up card as an SVG string. */
+  // Swords and clubs, arranged as on the Spanish deck
+  function longPips(suit, n) {
+    if (n === 1) return long(suit, 50, 76, 122, -24, 0);
+    const X = (x, y, h, a, i) => long(suit, x, y, h, a, i) + long(suit, x, y, h, -a, i + 1);
+    if (n === 2) return suit === 'syouf' ? long(suit, 38, 76, 112, 0) + long(suit, 62, 76, 112, 0) : X(50, 76, 112, 22, 0);
+    if (n === 3) return suit === 'syouf'
+      ? long(suit, 30, 76, 110, 0) + long(suit, 50, 76, 110, 0) + long(suit, 70, 76, 110, 0)
+      : X(50, 76, 112, 22, 0) + long(suit, 50, 76, 112, 0, 2);
+
+    if (suit === 'syouf') {
+      // crossed pair in the middle with straight swords around it
+      const xs = { 4: [24, 76], 5: [22, 50, 78], 6: [17, 31, 69, 83], 7: [17, 31, 50, 69, 83] }[n];
+      return X(50, 76, 104, n >= 6 ? 12 : 16, 0) + xs.map((x) => long(suit, x, 76, n >= 6 ? 98 : 104, 0)).join('');
+    }
+    // clubs: short ones in rows
+    if (n === 4) return [[34, 46, 14], [66, 46, -14], [34, 106, -14], [66, 106, 14]].map(([x, y, a], i) => long(suit, x, y, 52, a, i)).join('');
+    if (n === 5) return [[32, 44, 14], [68, 44, -14], [32, 108, -14], [68, 108, 14]].map(([x, y, a], i) => long(suit, x, y, 50, a, i)).join('')
+      + long(suit, 50, 76, 50, 90, 4);
+    const pos = n === 6
+      ? [[32, 38], [68, 38], [32, 76], [68, 76], [32, 114], [68, 114]]
+      : [[28, 38], [72, 38], [28, 76], [72, 76], [28, 114], [72, 114], [50, 76]];
+    return pos.map(([x, y], i) => long(suit, x, y, 40, 0, i)).join('');
+  }
+
+  function shortPips(suit, n) {
+    const p = PIPS[n];
+    let extra = '';
+    if (n === 1 && suit === 'dheb') {
+      // ribbon behind the ace of coins
+      extra = `<path d="M10 70 L90 70 L86 76 L90 82 L10 82 L14 76Z" fill="${B}" stroke="${K}" stroke-width=".8"/>
+        <path d="M10 70 L90 70" stroke="${W}" stroke-opacity=".5"/>`;
+    }
+    return extra + p.at.map(([x, y]) => use('s-' + suit, x, y, p.size)).join('');
+  }
+
+  // What a figure holds: coins/cups in the hand, swords/clubs over the shoulder
+  function held(suit, short, longArgs) {
+    return LONG[suit] ? long(suit, ...longArgs) : use('s-' + suit, ...short);
+  }
+
+  const face = (cx, cy, hair = Y) => `
+    <ellipse cx="${cx}" cy="${cy}" rx="7.5" ry="8.5" fill="${S}"/>
+    <circle cx="${cx - 2.8}" cy="${cy - .5}" r=".9" fill="${K}" stroke="none"/><circle cx="${cx + 2.8}" cy="${cy - .5}" r=".9" fill="${K}" stroke="none"/>
+    <path d="M${cx} ${cy} L${cx - .8} ${cy + 3} L${cx + .6} ${cy + 3}" fill="none" stroke-width=".6"/>
+    <path d="M${cx - 2} ${cy + 5} Q${cx} ${cy + 6} ${cx + 2} ${cy + 5}" fill="none" stroke="${R}" stroke-width=".8"/>
+    <path d="M${cx - 7.6} ${cy - 1} Q${cx - 8} ${cy - 10} ${cx} ${cy - 10} Q${cx + 8} ${cy - 10} ${cx + 7.6} ${cy - 1} Q${cx + 6} ${cy - 6} ${cx} ${cy - 6} Q${cx - 6} ${cy - 6} ${cx - 7.6} ${cy - 1}Z" fill="${hair}"/>
+    <path d="M${cx - 7.4} ${cy - 2} Q${cx - 9.5} ${cy + 6} ${cx - 5.5} ${cy + 9} L${cx - 5} ${cy + 1}Z" fill="${hair}"/>
+    <path d="M${cx + 7.4} ${cy - 2} Q${cx + 9.5} ${cy + 6} ${cx + 5.5} ${cy + 9} L${cx + 5} ${cy + 1}Z" fill="${hair}"/>`;
+
+  function sota(suit) {
+    return `<g stroke="${K}" stroke-width=".9" stroke-linejoin="round">
+      ${LONG[suit] ? held(suit, null, [70, 58, 82, 16, 1]) : ''}
+      <path d="M43 111 L42 135 L48 135 L49 111Z" fill="${R}"/>
+      <path d="M51 111 L52 135 L58 135 L57 111Z" fill="${Y}"/>
+      <path d="M41 135 L49 135 L49 139 L37 139 Q37 136 41 135Z" fill="${K}"/>
+      <path d="M51 135 L59 135 Q63 136 63 139 L51 139Z" fill="${K}"/>
+      <path d="M38 64 Q50 60 62 64 L67 111 Q50 116 33 111Z" fill="${B}"/>
+      <path d="M33.6 106 Q50 111 66.4 106 L67 111 Q50 116 33 111Z" fill="${Y}"/>
+      <path d="M50 63 L50 108" stroke="${Y}" stroke-width="2.2"/>
+      <path d="M36.6 87 Q50 90.5 63.4 87 L63.8 91.5 Q50 95 36.2 91.5Z" fill="${Y}"/>
+      <path d="M38.5 65 Q30 78 33 91 L38.5 90 Q36.5 80 41 71Z" fill="${R}"/>
+      <circle cx="35.5" cy="92" r="3" fill="${S}"/>
+      <path d="M61.5 65 Q71 69 72 80 L66.5 82 Q65.5 74 59 71Z" fill="${R}"/>
+      <circle cx="70" cy="83" r="3.2" fill="${S}"/>
+      <rect x="47" y="55" width="6" height="7" fill="${S}"/>
+      <path d="M42 62 Q50 68 58 62 L56 59.5 Q50 64 44 59.5Z" fill="${W}"/>
+      ${face(50, 47)}
+      <path d="M37 39 Q50 32 63 37 L61 40.5 Q50 36.5 39 41.5Z" fill="${R}"/>
+      <path d="M43 37.5 Q44 27 52 28 Q58 29 57.5 36 Q50 34.5 43 37.5Z" fill="${R}"/>
+      <path d="M56 31 Q66 21 71 25 Q64 26.5 58.5 34Z" fill="${Y}"/>
+      ${LONG[suit] ? '' : held(suit, [72, 80, 24])}
+    </g>`;
+  }
+
+  function caballo(suit) {
+    return `<g stroke="${K}" stroke-width=".9" stroke-linejoin="round">
+      ${LONG[suit] ? held(suit, null, [34, 40, 70, -22, 2]) : ''}
+      <path d="M83 92 Q93 97 90 118 Q86 105 81 100Z" fill="${Y}"/>
+      <path d="M66 106 L63 132 L68.5 132 L71 106Z" fill="${B}"/>
+      <path d="M74 104 L79 129 L84.5 128 L79 102Z" fill="${B}"/>
+      <path d="M28 95 Q30 83 46 83 L70 83 Q85 85 85 97 Q85 110 72 110 L40 110 Q28 108 28 95Z" fill="${B}"/>
+      <path d="M36 107 L33 132 L38.5 132 L41.5 107Z" fill="${B}"/>
+      <path d="M44 108 L46 132 L51.5 132 L49.5 108Z" fill="${B}"/>
+      <path d="M32.5 132 L39 132 L39 135 L32 135Z M45.5 132 L52 132 L52 135 L45.5 135Z M63 132 L69 132 L69 135 L62.5 135Z M79 129 L85 128 L85.5 131 L79.5 132Z" fill="${K}"/>
+      <path d="M35 93 Q29 79 27 67 Q25 58 18.5 60 Q12 62 13 68.5 Q14 73 20 73 Q24 75 26 85 Q28 93 34 99Z" fill="${B}"/>
+      <path d="M26.5 60.5 Q33 67 35 80 L31 83 Q29 71 24.5 62.5Z" fill="${Y}"/>
+      <circle cx="19" cy="64.5" r="1" fill="${K}"/>
+      <path d="M14 68 L18 69" stroke-width=".6"/>
+      <path d="M17 70 Q23 72 26 66" fill="none" stroke="${R}" stroke-width="1.4"/>
+      <path d="M45 83 L71 83 L73 104 Q58 108 43 104Z" fill="${R}"/>
+      <path d="M43.6 100 Q58 104 72.6 100 L73 104 Q58 108 43 104Z" fill="${Y}"/>
+      <path d="M54 87 L52 103 L57.5 105 L60.5 89Z" fill="${Y}"/>
+      <path d="M50 102 L58 104 L57 108 L48.5 107Z" fill="${K}"/>
+      <path d="M48 61 Q56 57 64 61 L65 88 Q56 91 47 88Z" fill="${R}"/>
+      <path d="M47.4 80 Q56 83 64.6 80 L64.8 84 Q56 87 47.2 84Z" fill="${Y}"/>
+      <path d="M62 63 Q69 70 66 80 L62 78 Q64 71 59 67Z" fill="${Y}"/>
+      <path d="M50 63 Q42 65 38 57 L42.5 54.5 Q46 60.5 52 59.5Z" fill="${Y}"/>
+      <circle cx="39.5" cy="55" r="3" fill="${S}"/>
+      <rect x="53" y="53" width="6" height="6" fill="${S}"/>
+      ${face(56, 46)}
+      <path d="M45 41 Q56 31 67 41 Q56 37.5 45 41Z" fill="${B}"/>
+      <path d="M44 41 L68 41 L66 43.5 L46 43.5Z" fill="${B}"/>
+      ${LONG[suit] ? '' : held(suit, [38, 47, 22])}
+    </g>`;
+  }
+
+  function rey(suit) {
+    return `<g stroke="${K}" stroke-width=".9" stroke-linejoin="round">
+      ${LONG[suit] ? held(suit, null, [30, 62, 74, 0, 0]) : ''}
+      <path d="M34 66 Q50 58 66 66 L75 138 L25 138Z" fill="${R}"/>
+      <path d="M25.5 133 L74.5 133 L75 138 L25 138Z" fill="${Y}"/>
+      <path d="M44.5 66 L55.5 66 L60.5 133 L39.5 133Z" fill="${B}"/>
+      <path d="M44.5 66 L39.5 133 M55.5 66 L60.5 133" stroke="${Y}" stroke-width="2.6"/>
+      <path d="M42 92 L58 92 L58.4 96.5 L41.6 96.5Z" fill="${Y}"/>
+      <path d="M36 68 Q27 80 29 95 L35.5 95 Q34 83 40 74Z" fill="${R}"/>
+      <path d="M29 92 L35.6 92" stroke="${Y}" stroke-width="2"/>
+      <circle cx="32" cy="97.5" r="3.2" fill="${S}"/>
+      <path d="M64 68 Q71 82 63 91 L58.5 87 Q63 80 60 72Z" fill="${R}"/>
+      <circle cx="58.5" cy="89" r="3" fill="${S}"/>
+      <rect x="47" y="55" width="6" height="7" fill="${S}"/>
+      <path d="M39 64 Q50 73 61 64 L58.5 60.5 Q50 67 41.5 60.5Z" fill="${Y}"/>
+      ${face(50, 47, BR)}
+      <path d="M42.5 49 Q43 62 50 63.5 Q57 62 57.5 49 Q55 55.5 50 55.5 Q45 55.5 42.5 49Z" fill="${BR}"/>
+      <path d="M47 53 Q50 51.5 53 53" fill="none" stroke-width=".7"/>
+      <path d="M41 39.5 L40.5 28 L45 33.5 L50 25 L55 33.5 L59.5 28 L59 39.5Z" fill="${Y}"/>
+      <rect x="40.5" y="37" width="19" height="4.2" fill="${Y}"/>
+      <circle cx="45" cy="39.1" r="1.2" fill="${R}" stroke="none"/><circle cx="50" cy="39.1" r="1.2" fill="${B}" stroke="none"/><circle cx="55" cy="39.1" r="1.2" fill="${R}" stroke="none"/>
+      <circle cx="50" cy="25" r="1.4" fill="${R}"/>
+      ${LONG[suit] ? '' : held(suit, [31, 104, 24])}
+    </g>`;
+  }
+
+  /** Face-up card as an SVG string, drawn in the Spanish-deck style. */
   function cardSVG(card) {
     const s = SUITS[card.suit];
-    const c = s.color;
-    let center;
-    if (card.rank >= 10) center = faceArt(card.rank, card.suit, c);
-    else {
-      const size = card.rank === 1 ? 52 : card.rank <= 3 ? 30 : 24;
-      center = PIPS[card.rank].map(([x, y]) => use('s-' + card.suit, x, y, size)).join('');
-      if (card.rank === 1) {
-        center = `<circle cx="50" cy="75" r="34" fill="${c}" fill-opacity=".07" stroke="${c}" stroke-opacity=".35" stroke-dasharray="2 3"/>` + center;
-      }
-    }
-    const corner = `<text x="12" y="23" text-anchor="middle" font-family="Reem Kufi, sans-serif" font-weight="700" font-size="17" fill="${c}">${card.rank}</text>
-      ${use('s-' + card.suit, 12, 33, 11)}`;
+    let art;
+    if (card.rank === 10) art = sota(card.suit);
+    else if (card.rank === 11) art = caballo(card.suit);
+    else if (card.rank === 12) art = rey(card.suit);
+    else art = LONG[card.suit] ? longPips(card.suit, card.rank) : shortPips(card.suit, card.rank);
+
+    // Gaps ("pausas") in the frame line tell the suit: coins 0, cups 1, swords 2, clubs 3
+    const gapX = { 0: [], 1: [50], 2: [42, 58], 3: [36, 50, 64] }[s.gaps];
+    const gaps = gapX.map((x) => `<rect x="${x - 3.5}" y="4" width="7" height="4" fill="${W}"/><rect x="${x - 3.5}" y="142" width="7" height="4" fill="${W}"/>`).join('');
+    const idx = (x, y) => `<rect x="${x - 7}" y="${y - 12}" width="14" height="15" fill="${W}"/>
+      <text x="${x}" y="${y}" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="12" fill="${K}">${card.rank}</text>`;
     return `<svg class="card-svg" viewBox="0 0 100 150" role="img" aria-label="${card.rank} of ${s.label}">
-      <rect x="1" y="1" width="98" height="148" rx="9" fill="#fffaf0" stroke="#d9c9a3" stroke-width="1.2"/>
-      <rect x="5.5" y="5.5" width="89" height="139" rx="6" fill="none" stroke="${c}" stroke-opacity=".45" stroke-width="1"/>
-      ${center}
-      <g>${corner}</g>
-      <g transform="rotate(180 50 75)">${corner}</g>
+      <rect x="1" y="1" width="98" height="148" rx="8" fill="${W}" stroke="#cfcfcf" stroke-width="1"/>
+      <rect x="6" y="6" width="88" height="138" rx="2" fill="none" stroke="${K}" stroke-width=".9"/>
+      ${gaps}
+      ${art}
+      ${idx(13, 17)}${idx(87, 143)}
     </svg>`;
   }
 
