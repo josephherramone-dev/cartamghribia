@@ -207,10 +207,23 @@
     </svg>`;
   }
 
+  // Real card images (public/cards/), when provided, replace the drawn artwork
+  let images = { cards: {}, back: null };
+  function setImages(manifest) {
+    images = { cards: (manifest && manifest.cards) || {}, back: (manifest && manifest.back) || null };
+    if (images.back) document.documentElement.style.setProperty('--back-img', `url("${images.back}")`);
+  }
+
   function makeCard(card, extra = '') {
     const el = document.createElement('div');
     el.className = `card ${card ? 'suit-' + card.suit : 'back'} ${extra}`;
-    el.innerHTML = card ? cardSVG(card) : backSVG();
+    const img = card ? images.cards[card.id] : images.back;
+    if (img) {
+      el.classList.add('photo');
+      el.innerHTML = `<img src="${img}" alt="${card ? card.rank + ' of ' + SUITS[card.suit].label : 'Card back'}" draggable="false">`;
+    } else {
+      el.innerHTML = card ? cardSVG(card) : backSVG();
+    }
     if (card) el.dataset.id = card.id;
     return el;
   }
@@ -284,5 +297,5 @@
     <circle cx="50" cy="75" r="3" fill="#e2b54a"/></svg>`;
   document.documentElement.style.setProperty('--back-img', `url("data:image/svg+xml,${encodeURIComponent(standaloneBack)}")`);
 
-  window.Carta = { SUITS, FACES, cardSVG, backSVG, makeCard, avatarHTML, escapeHTML, sound, setMuted, isMuted: () => muted, unlockAudio: audio };
+  window.Carta = { setImages, SUITS, FACES, cardSVG, backSVG, makeCard, avatarHTML, escapeHTML, sound, setMuted, isMuted: () => muted, unlockAudio: audio };
 })();

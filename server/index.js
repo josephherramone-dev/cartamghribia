@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const http = require('http');
 const crypto = require('crypto');
 const express = require('express');
@@ -15,6 +16,36 @@ const LEVELS = ['easy', 'hard'];
 const app = express();
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.get('/health', (_req, res) => res.json({ ok: true }));
+app.get('/card-images.json', (_req, res) => res.json(scanCardImages()));
+
+/**
+ * Optional real card images in public/cards/.
+ * Accepts names like "1-dheb.png", "oros-1.jpg", "12_bastos.webp", "back.png".
+ * Suits: dheb|oros|coins, kass|copas|cups, syouf|espadas|swords, zrawet|bastos|clubs.
+ */
+const CARDS_DIR = path.join(__dirname, '..', 'public', 'cards');
+const SUIT_ALIASES = {
+  dheb: 'dheb', oros: 'dheb', oro: 'dheb', coins: 'dheb',
+  kass: 'kass', copas: 'kass', copa: 'kass', cups: 'kass',
+  syouf: 'syouf', espadas: 'syouf', espada: 'syouf', swords: 'syouf',
+  zrawet: 'zrawet', bastos: 'zrawet', basto: 'zrawet', clubs: 'zrawet',
+};
+function scanCardImages() {
+  const out = { cards: {}, back: null };
+  let files = [];
+  try { files = fs.readdirSync(CARDS_DIR); } catch { return out; }
+  for (const f of files) {
+    const m = f.toLowerCase().match(/^([a-z]+|\d+)[-_ ]([a-z]+|\d+)\.(png|jpe?g|webp|svg|gif)$/);
+    const url = 'cards/' + encodeURIComponent(f);
+    if (/^back\.(png|jpe?g|webp|svg|gif)$/i.test(f)) { out.back = url; continue; }
+    if (!m) continue;
+    const [a, b] = [m[1], m[2]];
+    const rank = /^\d+$/.test(a) ? +a : +b;
+    const suit = SUIT_ALIASES[/^\d+$/.test(a) ? b : a];
+    if (suit && game.RANKS.includes(rank)) out.cards[`${rank}-${suit}`] = url;
+  }
+  return out;
+}
 
 const server = http.createServer(app);
 const io = new Server(server);

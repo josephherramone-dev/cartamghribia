@@ -54,7 +54,9 @@
     return n;
   }
 
-  // Decorative cards
+  // Decorative cards (drawn after we know whether real card images exist)
+  fetch('card-images.json').then((r) => r.json()).then(window.Carta.setImages).catch(() => {}).finally(drawDecor);
+  function drawDecor() {
   const fan = [{ rank: 1, suit: 'dheb' }, { rank: 7, suit: 'kass' }, { rank: 12, suit: 'syouf' }, { rank: 2, suit: 'zrawet' }, { rank: 11, suit: 'dheb' }];
   fan.forEach((c, i) => {
     const el = makeCard(c);
@@ -68,6 +70,8 @@
       const [rank, suit] = id.split('-');
       box.appendChild(makeCard({ rank: +rank, suit }));
     }
+  }
+  if (room && room.game) renderGame();
   }
 
   $('play-cpu').onclick = () => {
