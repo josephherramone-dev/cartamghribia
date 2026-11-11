@@ -1,40 +1,45 @@
-# Carta Mghribia — Hezz2 Online
+# Divoxe Games
 
-An online multiplayer version of **Hezz2**, the classic Moroccan *Carta Beldia* shedding game, played with the 40-card Spanish deck.
+A free, no-signup game platform: pick a nickname and play **Chess**, **8-Ball Pool** and **Carta Beldia (Hezz 2)**
+online with friends, in quick matches with other visitors, or against the computer.
 
-## Play locally
+Made by **Divoxe**.
+
+## Run it
 
 ```bash
 npm install
 npm start
 ```
 
-Open http://localhost:3000, then either:
+Open http://localhost:3000. For hosting on a VPS see [DEPLOY.md](DEPLOY.md).
 
-- **Play vs Computer**: pick 1–3 opponents and a level (Easy / Hard), or
-- **Play with Friends**: create a room and share the invite link (2–4 players). The host can fill empty seats with computer players.
+## Features
 
-## Put it online
+- Guest profiles (nickname and emoji avatar stored in the browser), no login
+- **Quick match** (matchmaking with people online), **private rooms** with invite links/codes, **vs computer** (Easy / Hard)
+- Computer players can fill empty seats in any room
+- Live chat with quick reactions, reconnect after refresh, rematches
+- Online player counter
+- Works on phones and desktops
 
-See [DEPLOY.md](DEPLOY.md) for hosting on a VPS (Node + nginx + HTTPS, or Docker).
+## Games
 
-## Rules
-
-- Each player gets 4 cards. Play a card matching the top card's **suit** or **number**.
-- Can't play? Draw one card; your turn ends.
-- **2**: the next player draws 2, unless they answer with a 2. Twos stack (2 → 4 → 6…).
-- **1**: skips the next player.
-- **7**: wild. Play it on anything and choose the next suit.
-- First player to empty their hand wins.
+| Game | Players | Notes |
+|------|---------|-------|
+| Carta Beldia | 2–4 | Moroccan Hezz 2 rules, Spanish-deck artwork, optional real card images in `public/cards/` |
+| Chess | 2 | Full rules via chess.js, alpha-beta computer player |
+| 8-Ball Pool | 2 | Shared physics on server and browser, standard 8-ball rules, simulation-based computer player |
 
 ## Project layout
 
-- `server/game.js`: the rules engine (pure functions, unit tested)
-- `server/game.js` also contains the computer player (`chooseBotMove`)
-- `server/index.js`: Express + Socket.IO server, rooms, bots, reconnection
-- `public/cards.js`: card artwork (SVG, traditional Spanish-deck style), avatars, sounds (Hijaz maqam)
-- `public/client.js`, `public/style.css`, `public/index.html`: the browser client (no build step)
-- `test/`: rules tests, run with `npm test`
+- `server/index.js` — Express + Socket.IO: rooms, matchmaking, bots, chat (game-agnostic)
+- `server/games/` — one adapter per game (rules on the server)
+- `public/js/app.js` — platform shell (home, game picker, lobby, chat, results)
+- `public/games/<id>/` — one browser module per game
+- `test/` — `npm test`
 
-The server is authoritative: it validates every move and only sends each player their own hand.
-If a player disconnects mid-game they can reload to rejoin; while they're away their turns are auto-drawn after 20 seconds.
+## Adding a game
+
+See [public/games/README.md](public/games/README.md): write a server adapter and a browser module, register both, done.
+The platform handles rooms, matchmaking, bots, chat and results.

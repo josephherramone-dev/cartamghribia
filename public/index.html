@@ -3,274 +3,135 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Carta Mghribia · الكارطة المغربية — Hezz 2 Online</title>
-  <meta name="description" content="Play Hezz 2, the classic Moroccan card game (Carta Beldia), online with friends or against the computer.">
-  <meta name="theme-color" content="#0b3b27">
+  <title>Divoxe Games — Play Chess, Pool & Carta Beldia online</title>
+  <meta name="description" content="Free online games with friends or against the computer. Chess, 8-ball pool and the Moroccan card game Carta Beldia. No signup.">
+  <meta name="theme-color" content="#0b0d1a">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Cairo:wght@400;600;700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Reem+Kufi:wght@500;700&family=Cairo:wght@400;600;700&family=Aref+Ruqaa:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-  <!-- Shared SVG art: suit symbols, zellige pattern, star -->
-  <svg class="svg-defs" aria-hidden="true" focusable="false">
-    <defs>
-      <linearGradient id="g-gold" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#f7dc7a"/><stop offset=".55" stop-color="#d9ab2e"/><stop offset="1" stop-color="#a87510"/>
-      </linearGradient>
-      <linearGradient id="g-steel" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#e9f0f8"/><stop offset=".5" stop-color="#a9bdd4"/><stop offset="1" stop-color="#6f8db0"/>
-      </linearGradient>
-      <linearGradient id="g-cup" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#d63a3f"/><stop offset=".6" stop-color="#b3202a"/><stop offset="1" stop-color="#7f121a"/>
-      </linearGradient>
-      <linearGradient id="g-wood" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0" stop-color="#b47a43"/><stop offset=".6" stop-color="#8b5a2b"/><stop offset="1" stop-color="#5e3a18"/>
-      </linearGradient>
+  <div class="bg-orbs" aria-hidden="true"><i></i><i></i><i></i></div>
 
-      <!-- 8-pointed Moroccan star (khatam) centred on 0,0 with radius ~10 -->
-      <symbol id="star8" viewBox="-10 -10 20 20" overflow="visible">
-        <rect x="-7" y="-7" width="14" height="14"/>
-        <rect x="-7" y="-7" width="14" height="14" transform="rotate(45)"/>
-      </symbol>
-
-      <!-- Zellige tile pattern for card backs -->
-      <pattern id="zellige" width="24" height="24" patternUnits="userSpaceOnUse">
-        <rect width="24" height="24" fill="#8e1b22"/>
-        <g transform="translate(12 12)" fill="#0f5132" stroke="#e2b54a" stroke-width=".8">
-          <rect x="-6" y="-6" width="12" height="12"/>
-          <rect x="-6" y="-6" width="12" height="12" transform="rotate(45)"/>
-        </g>
-        <circle cx="12" cy="12" r="2.2" fill="#f4e7c8"/>
-        <g fill="#f4e7c8">
-          <path d="M0 -3 L3 0 L0 3 L-3 0Z"/><path d="M24 -3 L27 0 L24 3 L21 0Z"/>
-          <path d="M0 21 L3 24 L0 27 L-3 24Z"/><path d="M24 21 L27 24 L24 27 L21 24Z"/>
-        </g>
-      </pattern>
-
-      <!-- Suits in the traditional Spanish-deck style (flat red / blue / yellow / green) -->
-      <symbol id="s-dheb" viewBox="-20 -20 40 40">
-        <circle r="18.5" fill="#f4c20d" stroke="#1a1a1a" stroke-width="1.2"/>
-        <circle r="15.5" fill="none" stroke="#d4231c" stroke-width="1.4"/>
-        <circle r="13" fill="#f7d54a" stroke="#1a1a1a" stroke-width=".6"/>
-        <g fill="#f4c20d" stroke="#d4231c" stroke-width=".9">
-          <ellipse cx="0" cy="-7" rx="3.2" ry="5.6"/><ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(45)"/>
-          <ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(90)"/><ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(135)"/>
-          <ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(180)"/><ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(225)"/>
-          <ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(270)"/><ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(315)"/>
-        </g>
-        <circle r="3.6" fill="#d4231c" stroke="#1a1a1a" stroke-width=".6"/>
-        <circle r="1.3" fill="#f4c20d"/>
-      </symbol>
-      <symbol id="s-kass" viewBox="-20 -20 40 40">
-        <path d="M-14 -13 Q-14 3 -3 5.5 L-3 9 Q-10 11 -11.5 18 L11.5 18 Q10 11 3 9 L3 5.5 Q14 3 14 -13Z" fill="#f4c20d" stroke="#1a1a1a" stroke-width="1.1"/>
-        <path d="M-13.8 -8 L13.8 -8 Q13.6 -4.5 12.8 -2.5 L-12.8 -2.5 Q-13.6 -4.5 -13.8 -8Z" fill="#d4231c"/>
-        <path d="M-10 1.6 L10 1.6 Q7 4.5 3 5.5 L-3 5.5 Q-7 4.5 -10 1.6Z" fill="#1d5bb5"/>
-        <ellipse cx="0" cy="-13" rx="14" ry="3.4" fill="#1d5bb5" stroke="#1a1a1a" stroke-width="1"/>
-        <ellipse cx="0" cy="-13" rx="10" ry="1.6" fill="#0f3d80"/>
-        <ellipse cx="0" cy="7.4" rx="5" ry="2" fill="#d4231c" stroke="#1a1a1a" stroke-width=".7"/>
-        <path d="M-10.6 14.5 L10.6 14.5 L11.5 18 L-11.5 18Z" fill="#1d5bb5" stroke="#1a1a1a" stroke-width=".7"/>
-      </symbol>
-      <symbol id="s-syouf" viewBox="-8 -26 16 52">
-        <path d="M0 -25.5 L2.7 -19 L2.7 11.5 L-2.7 11.5 L-2.7 -19Z" fill="#1d5bb5" stroke="#1a1a1a" stroke-width=".8"/>
-        <path d="M0 -22 L0 10.5" stroke="#8fb5e8" stroke-width="1"/>
-        <path d="M-7.6 11.3 Q0 14.6 7.6 11.3 L7.6 14.4 Q0 17.6 -7.6 14.4Z" fill="#f4c20d" stroke="#1a1a1a" stroke-width=".7"/>
-        <rect x="-1.9" y="15.8" width="3.8" height="6" fill="#d4231c" stroke="#1a1a1a" stroke-width=".5"/>
-        <circle cy="23.2" r="2.4" fill="#f4c20d" stroke="#1a1a1a" stroke-width=".6"/>
-      </symbol>
-      <symbol id="s-zrawet" viewBox="-8 -26 16 52">
-        <g stroke="#1a1a1a" stroke-width=".6">
-          <path d="M-4.6 -6 L-7.2 -8.4 L-6 -4.4Z M4.4 2 L7.2 0 L5.8 4.2Z M-4 11 L-6.8 9.4 L-5.4 13.2Z" fill="#f4c20d"/>
-          <ellipse cx="-7.3" cy="-10" rx="1.2" ry="2.2" fill="#2f8f3e" transform="rotate(-25 -7.3 -10)"/>
-          <ellipse cx="7.4" cy="-1.8" rx="1.2" ry="2.2" fill="#2f8f3e" transform="rotate(25 7.4 -1.8)"/>
-        </g>
-        <path d="M-2.6 25 L-4.4 -14 Q-7 -22 0 -25.6 Q7 -22 4.4 -14 L2.6 25Z" style="fill: var(--club, #2f8f3e)" stroke="#1a1a1a" stroke-width=".9"/>
-        <path d="M-3.9 -14.5 Q0 -12.6 3.9 -14.5 M-3.5 -1 Q0 1 3.5 -1 M-3 12 Q0 13.8 3 12" stroke="#1a1a1a" stroke-width=".6" fill="none"/>
-        <path d="M-1.4 -22 Q-2.6 -10 -1.2 22" stroke="#fff" stroke-opacity=".45" stroke-width="1" fill="none"/>
-      </symbol>
-
-      <!-- Fez (tarbouch) for computer players -->
-      <symbol id="fez" viewBox="0 0 40 40">
-        <path d="M11 30 L14 10 Q20 7 26 10 L29 30 Q20 33 11 30Z" fill="#b3202a" stroke="#6e1016" stroke-width="1.2"/>
-        <ellipse cx="20" cy="10" rx="6" ry="1.8" fill="#8e1b22"/>
-        <path d="M20 9 Q25 12 26 22" stroke="#1b1b1b" stroke-width="1.4" fill="none"/>
-        <path d="M24.5 20 L27.5 20 L28 26 L24 26Z" fill="#1b1b1b"/>
-      </symbol>
-    </defs>
-  </svg>
+  <header class="site-header">
+    <a href="#/" class="logo" aria-label="Divoxe Games home">
+      <svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+        <rect x="3" y="3" width="34" height="34" rx="11" fill="url(#lg)"/>
+        <path d="M13 12h8.5a8 8 0 0 1 0 16H13z" fill="none" stroke="#fff" stroke-width="3.4" stroke-linejoin="round"/>
+        <circle cx="27.5" cy="12.5" r="2.4" fill="#fff"/>
+      </svg>
+      <span class="logo-text">divoxe<b>games</b></span>
+    </a>
+    <div class="header-right">
+      <span class="online-pill" id="online-pill"><i></i><span id="online-count">—</span> online</span>
+      <button class="btn-ghost" id="btn-join-code">Join with code</button>
+      <button class="profile-chip" id="profile-chip" aria-label="Edit your profile">
+        <span class="av" id="profile-av"></span><span id="profile-name"></span>
+      </button>
+    </div>
+  </header>
 
   <!-- ============ HOME ============ -->
-  <main id="home" class="screen">
+  <main id="view-home" class="view">
     <section class="hero">
-      <div class="arch">
-        <svg class="emblem" viewBox="-12 -12 24 24"><use href="#star8" width="20" height="20" x="-10" y="-10" class="emblem-star"/></svg>
-        <h1 class="title-ar" lang="ar">الكارطة المغربية</h1>
-        <h2 class="title">Carta Mghribia</h2>
-        <p class="tagline"><span lang="ar">هز جوج</span> · Hezz 2 — the classic Moroccan card game</p>
-        <div class="hero-fan" id="hero-fan"></div>
-      </div>
+      <p class="eyebrow"><span class="dot-live"></span> No account. No download. Just play.</p>
+      <h1>Game night,<br><span class="grad">anytime.</span></h1>
+      <p class="lead">Challenge friends with a link, jump into a quick match with players online, or practice against the computer.</p>
     </section>
 
-    <section class="setup">
-      <label class="field">
-        <span>Your name <span lang="ar">· سميتك</span></span>
-        <input id="name" maxlength="16" placeholder="e.g. Youssef" autocomplete="nickname">
-      </label>
-
-      <div class="modes">
-        <article class="mode">
-          <div class="mode-head">
-            <svg class="mode-icon"><use href="#fez"/></svg>
-            <div><h3>Play vs Computer</h3><p lang="ar">ضد الحاسوب</p></div>
-          </div>
-          <div class="opt">
-            <span>Opponents</span>
-            <div class="seg" id="seg-bots" role="radiogroup">
-              <button data-v="1" class="on">1</button><button data-v="2">2</button><button data-v="3">3</button>
-            </div>
-          </div>
-          <div class="opt">
-            <span>Level</span>
-            <div class="seg" id="seg-level" role="radiogroup">
-              <button data-v="easy">Easy <small lang="ar">ساهل</small></button>
-              <button data-v="hard" class="on">Hard <small lang="ar">صعيب</small></button>
-            </div>
-          </div>
-          <button id="play-cpu" class="btn primary">Play now</button>
-        </article>
-
-        <article class="mode">
-          <div class="mode-head">
-            <svg class="mode-icon" viewBox="0 0 40 40"><use href="#star8" x="10" y="10" width="20" height="20" class="icon-star"/></svg>
-            <div><h3>Play with Friends</h3><p lang="ar">مع الصحاب</p></div>
-          </div>
-          <p class="muted">Create a private room and share the link. 2–4 players, and you can fill empty seats with computers.</p>
-          <button id="create" class="btn primary">Create a room</button>
-          <div class="join-row">
-            <input id="code" maxlength="5" placeholder="CODE" aria-label="Room code" autocomplete="off">
-            <button id="join" class="btn">Join</button>
-          </div>
-        </article>
-      </div>
+    <section class="games-section">
+      <div class="section-head"><h2>Games</h2><span class="muted" id="games-count"></span></div>
+      <div class="game-grid" id="game-grid"></div>
     </section>
 
-    <section class="rules">
-      <h3 class="section-title"><span>How to play</span> <span lang="ar">طريقة اللعب</span></h3>
-      <div class="rule-grid">
-        <div class="rule"><div class="rule-cards" data-cards="5-kass,5-dheb"></div><h4>Match</h4><p>Play a card with the same <b>suit</b> or <b>number</b> as the top card. Can't? Draw one and your turn ends.</p></div>
-        <div class="rule"><div class="rule-cards" data-cards="2-syouf"></div><h4>2 · Hezz jouj</h4><p>The next player draws 2, unless they answer with another 2. Twos stack: 2, 4, 6…</p></div>
-        <div class="rule"><div class="rule-cards" data-cards="1-dheb"></div><h4>1 · Skip</h4><p>The next player loses their turn.</p></div>
-        <div class="rule"><div class="rule-cards" data-cards="7-zrawet"></div><h4>7 · Wild</h4><p>Play it on anything and choose the next suit.</p></div>
-      </div>
-      <p class="goal">First to empty their hand wins. <span lang="ar">اللي سالا الكارطة ديالو هو الرابح</span></p>
+    <section class="how">
+      <div class="how-step"><span class="how-n">1</span><h3>Pick a nickname</h3><p>Choose a name and an avatar. That's all — no signup.</p></div>
+      <div class="how-step"><span class="how-n">2</span><h3>Choose a game</h3><p>Quick match with people online, or create a private room.</p></div>
+      <div class="how-step"><span class="how-n">3</span><h3>Share the link</h3><p>Friends join from any phone or computer. Fill empty seats with bots.</p></div>
     </section>
-
-    <footer class="foot">Made with <span class="heart">♥</span> for Moroccan card lovers</footer>
   </main>
 
-  <!-- ============ LOBBY ============ -->
-  <main id="lobby" class="screen hidden">
-    <div class="lobby-card">
-      <p class="eyebrow">Room code</p>
-      <div class="room-code" id="lobby-code"></div>
-      <div class="invite-row">
-        <input id="invite" readonly aria-label="Invite link">
-        <button id="copy" class="btn">Copy</button>
-        <button id="share" class="btn hidden">Share</button>
+  <!-- ============ ROOM ============ -->
+  <main id="view-room" class="view hidden">
+    <div class="room-bar">
+      <button class="icon-btn" id="room-back" title="Leave" aria-label="Leave room">←</button>
+      <div class="room-title"><span id="room-game-icon" class="room-game-icon"></span><div><b id="room-game-name"></b><small id="room-sub"></small></div></div>
+      <div class="room-actions">
+        <button class="icon-btn" id="btn-sound" title="Sound" aria-label="Toggle sound">🔊</button>
+        <button class="icon-btn" id="btn-side" title="Players & chat" aria-label="Players and chat">💬<span class="dot hidden" id="chat-dot"></span></button>
       </div>
-      <div class="seats" id="lobby-seats"></div>
-      <div class="lobby-actions">
-        <div id="bot-level-wrap" class="opt compact">
-          <span>Computer level</span>
-          <div class="seg" id="seg-lobby-level">
-            <button data-v="easy">Easy</button><button data-v="hard" class="on">Hard</button>
-          </div>
+    </div>
+    <div class="room-body">
+      <section class="stage" id="stage"></section>
+      <aside class="side" id="side">
+        <div class="side-block">
+          <h4>Players</h4>
+          <ul class="player-list" id="player-list"></ul>
         </div>
-        <button id="start" class="btn primary big">Start game</button>
-        <p id="lobby-wait" class="muted center">Waiting for the host to start…</p>
-        <button id="leave-lobby" class="btn ghost">Leave room</button>
-      </div>
+        <div class="side-block chat-block">
+          <h4>Chat</h4>
+          <ul class="chat-list" id="chat-list"></ul>
+          <div class="reactions" id="reactions"></div>
+          <form id="chat-form" class="chat-form"><input id="chat-input" maxlength="200" placeholder="Say something…" autocomplete="off"><button class="btn small">Send</button></form>
+        </div>
+      </aside>
     </div>
   </main>
 
-  <!-- ============ GAME ============ -->
-  <main id="game" class="screen hidden">
-    <header class="topbar">
-      <div class="brand-sm"><svg viewBox="-12 -12 24 24"><use href="#star8" x="-10" y="-10" width="20" height="20"/></svg><span>Hezz 2</span></div>
-      <div class="room-chip" id="room-chip"></div>
-      <div class="top-actions">
-        <button id="btn-sound" class="icon-btn" title="Sound" aria-label="Toggle sound">🔊</button>
-        <button id="btn-panel" class="icon-btn" title="Log & chat" aria-label="Toggle log and chat">💬<span id="chat-dot" class="dot hidden"></span></button>
-        <button id="btn-leave" class="icon-btn" title="Leave" aria-label="Leave game">✕</button>
-      </div>
-    </header>
+  <footer class="site-footer" id="site-footer">
+    <span>Made by <b class="brand-sig">Divoxe</b></span>
+    <span class="muted">© <span id="year"></span> Divoxe Games</span>
+  </footer>
 
-    <div class="table-wrap">
-      <div class="table" id="table">
-        <div class="seats-layer" id="seats"></div>
-        <div class="center">
-          <button class="pile" id="draw-pile" aria-label="Draw a card">
-            <span class="pile-stack"></span>
-            <span class="pile-count" id="draw-count"></span>
-            <span class="pile-label" id="draw-label">Draw</span>
-          </button>
-          <div class="discard" id="discard"></div>
-          <div class="status">
-            <div class="turn-banner" id="turn-label"></div>
-            <div class="suit-chip" id="suit-chip"></div>
-            <div class="pending" id="pending-label"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- Game sheet (choose how to play) -->
+  <div class="modal hidden" id="game-sheet" role="dialog" aria-modal="true">
+    <div class="sheet" id="sheet-content"></div>
+  </div>
 
-    <section class="me" id="me">
-      <div class="me-info" id="me-info"></div>
-      <div class="hand" id="hand"></div>
-    </section>
-
-    <aside class="panel-side" id="side">
-      <div class="side-tabs">
-        <button data-tab="log" class="on">Game log</button>
-        <button data-tab="chat">Chat</button>
-      </div>
-      <ul id="log" class="feed"></ul>
-      <div id="chat-wrap" class="hidden">
-        <ul id="chat" class="feed"></ul>
-        <div class="quick" id="quick"></div>
-        <form id="chat-form"><input id="chat-input" maxlength="200" placeholder="Say something…" autocomplete="off"><button class="btn">Send</button></form>
-      </div>
-    </aside>
-  </main>
-
-  <!-- Suit picker -->
-  <div id="suit-picker" class="modal hidden" role="dialog" aria-label="Choose a suit">
-    <div class="modal-card arch-top">
-      <h3>Choose the suit <span lang="ar">ختار النوع</span></h3>
-      <div id="suit-options" class="suit-options"></div>
-      <button id="suit-cancel" class="btn ghost">Cancel</button>
+  <!-- Profile -->
+  <div class="modal hidden" id="profile-modal" role="dialog" aria-modal="true">
+    <div class="dialog">
+      <h3>Your profile</h3>
+      <label class="field"><span>Nickname</span><input id="profile-input" maxlength="16" autocomplete="nickname"></label>
+      <div class="field"><span>Avatar</span><div class="avatar-grid" id="avatar-grid"></div></div>
+      <div class="dialog-actions"><button class="btn" id="profile-save">Save</button></div>
     </div>
   </div>
 
-  <!-- Winner -->
-  <div id="winner" class="modal hidden" role="dialog">
+  <!-- Join with code -->
+  <div class="modal hidden" id="code-modal" role="dialog" aria-modal="true">
+    <div class="dialog">
+      <h3>Join a room</h3>
+      <p class="muted">Enter the 5-letter code your friend shared.</p>
+      <input id="code-input" class="code-input" maxlength="5" placeholder="ABCDE" autocomplete="off">
+      <div class="dialog-actions"><button class="btn-ghost" data-close>Cancel</button><button class="btn" id="code-go">Join</button></div>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="modal hidden" id="result-modal" role="dialog" aria-modal="true">
     <div class="confetti" id="confetti"></div>
-    <div class="modal-card arch-top">
-      <svg class="emblem big" viewBox="-12 -12 24 24"><use href="#star8" x="-10" y="-10" width="20" height="20" class="emblem-star"/></svg>
-      <h2 id="winner-ar" lang="ar"></h2>
-      <h3 id="winner-text"></h3>
-      <ul id="winner-standings" class="standings"></ul>
-      <button id="rematch" class="btn primary big">Play again</button>
-      <p id="rematch-wait" class="muted center">Waiting for the host…</p>
-      <button id="to-menu" class="btn ghost">Back to menu</button>
+    <div class="dialog result">
+      <div class="result-emoji" id="result-emoji"></div>
+      <h2 id="result-title"></h2>
+      <p class="muted" id="result-text"></p>
+      <ul class="standings" id="result-standings"></ul>
+      <div class="dialog-actions column">
+        <button class="btn big" id="result-again">Play again</button>
+        <p class="muted center" id="result-wait">Waiting for the host to start a new game…</p>
+        <button class="btn-ghost" id="result-close">Look at the board</button>
+        <button class="btn-ghost" id="result-leave">Back to games</button>
+      </div>
     </div>
   </div>
 
-  <div id="toast" class="toast hidden" role="status"></div>
+  <div class="toast hidden" id="toast" role="status"></div>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="cards.js"></script>
-  <script src="client.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

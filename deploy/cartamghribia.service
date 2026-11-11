@@ -1,6 +1,6 @@
 # systemd service: copy to /etc/systemd/system/cartamghribia.service
 [Unit]
-Description=Carta Mghribia (Hezz 2) game server
+Description=Divoxe Games server
 After=network.target
 
 [Service]

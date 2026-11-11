@@ -1,7 +1,7 @@
 {
-  "name": "cartamghribia",
+  "name": "divoxe-games",
   "version": "0.1.0",
-  "description": "Online multiplayer Hezz2 (Carta Beldia) card game",
+  "description": "Divoxe Games \u2014 play Chess, 8-Ball Pool and Carta Beldia online with friends or the computer",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
@@ -12,6 +12,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "chess.js": "^1.4.0",
     "express": "^4.22.3",
     "socket.io": "^4.8.4"
   }

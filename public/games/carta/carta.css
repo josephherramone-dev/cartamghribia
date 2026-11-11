@@ -1,0 +1,137 @@
+/* Carta Beldia — Moroccan table styling (scoped to .carta and its cards) */
+.game-carta {
+  --ct-green-900: #072a1c; --ct-green-800: #0b3b27; --ct-green-700: #0f5132; --ct-green-600: #146b42;
+  --ct-red: #c1272d; --ct-red-dark: #8e1b22; --ct-gold: #e2b54a; --ct-gold-deep: #b8892a;
+  --ct-cream: #fbf3e2; --ct-sand: #efe0c0; --ct-ink: #2a1d12;
+  --card-w: clamp(56px, 6.2vw, 92px);
+  --ct-zellige: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cg fill='none' stroke='%23e2b54a' stroke-opacity='.09' stroke-width='1.2'%3E%3Crect x='20' y='20' width='24' height='24'/%3E%3Crect x='20' y='20' width='24' height='24' transform='rotate(45 32 32)'/%3E%3Cpath d='M0 0L12 12M64 0L52 12M0 64L12 52M64 64L52 52'/%3E%3Ccircle cx='32' cy='32' r='5'/%3E%3C/g%3E%3C/svg%3E");
+  background: var(--ct-zellige), radial-gradient(ellipse at 50% 0%, var(--ct-green-700), var(--ct-green-900) 75%);
+  color: var(--ct-cream);
+  font-family: "Cairo", var(--font, system-ui), sans-serif;
+}
+.game-carta [lang="ar"], .carta-art [lang="ar"] { font-family: "Aref Ruqaa", "Reem Kufi", serif; direction: rtl; unicode-bidi: isolate; }
+.carta { height: 100%; display: flex; flex-direction: column; }
+
+/* cards (also used by the home-page art) */
+.card {
+  width: var(--card-w, 80px); aspect-ratio: 2 / 3; flex-shrink: 0; position: relative;
+  border-radius: calc(var(--card-w, 80px) * .1); background: #fff; user-select: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .35), 0 1px 2px rgba(0, 0, 0, .3);
+}
+.card-svg { width: 100%; height: 100%; display: block; }
+.card.photo { overflow: hidden; }
+.card.photo img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: inherit; pointer-events: none; }
+.carta-art { position: relative; background: radial-gradient(ellipse at 50% 30%, #146b42, #0b3b27 70%); }
+.carta-art .card { border-radius: 8%; }
+.carta-art-title { position: absolute; top: 8%; left: 0; right: 0; text-align: center; color: #e2b54a; font-size: clamp(1rem, 4vw, 1.6rem); text-shadow: 0 2px 0 rgba(0, 0, 0, .3); }
+
+/* table */
+.ct-table-wrap { flex: 1; position: relative; padding: 14px; min-height: 340px; }
+.ct-table {
+  position: relative; height: 100%; border-radius: 48% / 40%;
+  background: radial-gradient(ellipse at 50% 45%, rgba(255, 255, 255, .08), transparent 60%), var(--ct-zellige),
+    radial-gradient(ellipse at center, var(--ct-green-600), var(--ct-green-800) 75%);
+  border: 10px solid transparent;
+  box-shadow: 0 0 0 3px var(--ct-gold-deep), 0 0 0 9px var(--ct-red-dark), 0 0 0 11px var(--ct-gold), inset 0 0 60px rgba(0, 0, 0, .45), 0 18px 40px rgba(0, 0, 0, .35);
+}
+.ct-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: clamp(14px, 3vw, 36px); flex-wrap: wrap; padding: 70px 20px; }
+.ct-pile { all: unset; position: relative; width: var(--card-w); aspect-ratio: 2 / 3; }
+.ct-pile-stack, .ct-pile-stack::before, .ct-pile-stack::after {
+  position: absolute; inset: 0; border-radius: calc(var(--card-w) * .1);
+  background: var(--back-img) center / 100% 100% no-repeat; box-shadow: 0 3px 8px rgba(0, 0, 0, .4);
+}
+.ct-pile-stack::before, .ct-pile-stack::after { content: ""; }
+.ct-pile-stack::before { transform: translate(-3px, -3px); z-index: -1; }
+.ct-pile-stack::after { transform: translate(-6px, -6px); z-index: -2; }
+.ct-pile-count { position: absolute; right: -8px; top: -8px; z-index: 2; min-width: 28px; height: 28px; padding: 0 6px; display: grid; place-items: center; border-radius: 14px; background: var(--ct-cream); color: var(--ct-ink); font: 700 .85rem "Reem Kufi", sans-serif; box-shadow: 0 2px 6px rgba(0, 0, 0, .3); }
+.ct-pile-label { position: absolute; left: 50%; bottom: -30px; transform: translateX(-50%); white-space: nowrap; font: 700 .85rem "Reem Kufi", sans-serif; color: var(--ct-gold); opacity: 0; transition: opacity .2s; }
+.ct-pile.active { cursor: pointer; }
+.ct-pile.active .ct-pile-stack { animation: ctGlow 1.4s ease-in-out infinite; }
+.ct-pile.active .ct-pile-label { opacity: 1; }
+@keyframes ctGlow { 0%, 100% { box-shadow: 0 0 0 3px var(--ct-gold), 0 3px 8px rgba(0, 0, 0, .4); } 50% { box-shadow: 0 0 0 3px var(--ct-gold), 0 0 26px 6px rgba(226, 181, 74, .55); } }
+.ct-discard { position: relative; width: var(--card-w); aspect-ratio: 2 / 3; }
+.ct-discard .card { position: absolute; inset: 0; width: 100%; }
+.ct-status { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 170px; max-width: 240px; }
+.ct-turn { font: 700 1.05rem "Reem Kufi", sans-serif; padding: 6px 16px; border-radius: 999px; background: rgba(7, 42, 28, .7); border: 1px solid rgba(226, 181, 74, .4); white-space: nowrap; }
+.ct-turn.mine { background: var(--ct-gold); color: var(--ct-ink); animation: ctBob 1.6s ease-in-out infinite; }
+@keyframes ctBob { 50% { transform: translateY(-3px); } }
+.ct-suit { display: flex; align-items: center; gap: 8px; background: var(--ct-cream); color: var(--ct-ink); padding: 4px 14px 4px 6px; border-radius: 999px; font-weight: 700; box-shadow: 0 3px 8px rgba(0, 0, 0, .25); }
+.ct-suit svg { width: 28px; height: 28px; }
+.ct-suit [lang="ar"] { color: #7b6a55; }
+.ct-suit.changed { animation: ctPop .5s ease; }
+.ct-pending { font: 700 1.3rem "Reem Kufi", sans-serif; color: #fff; background: var(--ct-red); padding: 2px 14px; border-radius: 10px; box-shadow: 0 0 0 2px var(--ct-gold); animation: ctThrob 1s ease-in-out infinite; }
+.ct-pending:empty { display: none; }
+.ct-last { font-size: .82rem; color: var(--ct-sand); opacity: .85; text-align: center; line-height: 1.3; }
+@keyframes ctThrob { 50% { transform: scale(1.08); } }
+@keyframes ctPop { 0% { transform: scale(.6); } 70% { transform: scale(1.12); } 100% { transform: scale(1); } }
+
+/* seats */
+.ct-seats { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.ct-seat { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 12px; border-radius: 16px; background: rgba(7, 42, 28, .78); border: 1.5px solid rgba(226, 181, 74, .35); min-width: 120px; transition: box-shadow .3s, border-color .3s; }
+.ct-seat.active { border-color: var(--ct-gold); box-shadow: 0 0 0 3px rgba(226, 181, 74, .35), 0 0 24px rgba(226, 181, 74, .45); }
+.ct-seat.offline { opacity: .55; }
+.ct-row { display: flex; align-items: center; gap: 8px; }
+.ct-seat .av { width: 34px; height: 34px; background: var(--ct-cream); box-shadow: 0 0 0 2px var(--ct-gold); }
+.ct-nm { font-weight: 700; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ct-tag { font-size: .72rem; color: var(--ct-sand); opacity: .8; line-height: 1; }
+.ct-fan { display: flex; height: 40px; align-items: flex-end; }
+.ct-mini { width: 26px; margin-left: -14px; aspect-ratio: 2 / 3; border-radius: 3px; box-shadow: 0 1px 3px rgba(0, 0, 0, .4); background: var(--back-img) center / 100% 100% no-repeat; }
+.ct-mini:first-child { margin-left: 0; }
+.ct-count { font: 700 .8rem "Reem Kufi", sans-serif; color: var(--ct-gold); }
+.ct-seat.last-card .ct-count { color: #fff; background: var(--ct-red); padding: 0 8px; border-radius: 8px; animation: ctThrob 1s infinite; }
+.ct-thinking { display: inline-flex; gap: 3px; }
+.ct-thinking i { width: 5px; height: 5px; border-radius: 50%; background: var(--ct-gold); animation: ctDots 1s infinite; }
+.ct-thinking i:nth-child(2) { animation-delay: .15s; }
+.ct-thinking i:nth-child(3) { animation-delay: .3s; }
+@keyframes ctDots { 0%, 100% { opacity: .2; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
+.pos-top { top: 14px; left: 50%; transform: translateX(-50%); }
+.pos-top-left { top: 14px; left: 22%; transform: translateX(-50%); }
+.pos-top-right { top: 14px; left: 78%; transform: translateX(-50%); }
+.pos-left { left: 14px; top: 50%; transform: translateY(-50%); }
+.pos-right { right: 14px; top: 50%; transform: translateY(-50%); }
+
+/* my hand */
+.ct-me { padding: 4px 12px 14px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ct-me-info { display: flex; align-items: center; gap: 10px; font-family: "Reem Kufi", sans-serif; }
+.ct-me-info .av { width: 30px; height: 30px; background: var(--ct-cream); box-shadow: 0 0 0 2px var(--ct-gold); }
+.ct-me-info span:last-child { color: var(--ct-sand); font-size: .9rem; }
+.ct-me-info.active b { color: var(--ct-gold); }
+.ct-hand { display: flex; justify-content: center; padding: 18px 10px 4px; min-height: calc(var(--card-w) * 1.5 + 22px); max-width: 100%; }
+.ct-hand .card { margin-left: calc(var(--card-w) * var(--overlap, -.18)); cursor: pointer; transition: transform .18s cubic-bezier(.2, .8, .2, 1), filter .2s, box-shadow .2s; }
+.ct-hand .card:first-child { margin-left: 0; }
+.ct-hand .card.playable { transform: translateY(-14px); box-shadow: 0 0 0 3px var(--ct-gold), 0 10px 18px rgba(0, 0, 0, .45); }
+.ct-hand .card.playable:hover { transform: translateY(-24px) scale(1.04); z-index: 5; }
+.ct-hand .card.dim { filter: brightness(.6) saturate(.6); }
+.ct-hand .card.enter { animation: ctDeal .45s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes ctDeal { from { transform: translateY(-120px) scale(.6) rotate(-10deg); opacity: 0; } }
+.ct-fly { position: fixed !important; z-index: 60; pointer-events: none; transition: transform .45s cubic-bezier(.2, .8, .2, 1), opacity .45s; }
+
+/* suit picker */
+.ct-modal { position: absolute; inset: 0; z-index: 10; display: grid; place-items: center; padding: 16px; background: rgba(4, 20, 13, .7); backdrop-filter: blur(4px); }
+.ct-modal-card { width: min(420px, 100%); background: var(--ct-cream); color: var(--ct-ink); text-align: center; padding: 40px 20px 18px; display: flex; flex-direction: column; gap: 12px; border: 3px solid var(--ct-gold); border-radius: 240px 240px 16px 16px / 90px 90px 16px 16px; animation: ctPop .3s; }
+.ct-modal-card h3 { margin: 0; font: 700 1.25rem "Reem Kufi", sans-serif; }
+.ct-modal-card h3 [lang="ar"] { color: #7b6a55; margin-inline-start: 6px; }
+.ct-suit-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ct-suit-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 8px; border-radius: 14px; background: #fff; border: 2px solid #ecdcb8; font: 700 1rem "Cairo", sans-serif; color: var(--ct-ink); cursor: pointer; transition: transform .15s, border-color .15s; }
+.ct-suit-btn:hover { transform: translateY(-3px); border-color: var(--c); }
+.ct-suit-btn svg { width: 50px; height: 50px; }
+.ct-suit-btn [lang="ar"] { color: var(--c); }
+.ct-suit-btn small { color: #7b6a55; font-weight: 600; }
+.ct-modal-card .btn-ghost { color: #7b6a55; border-color: transparent; background: none; }
+
+@media (max-width: 640px) {
+  .game-carta { --card-w: 54px; }
+  .ct-table { border-radius: 28px; }
+  .ct-table-wrap { padding: 10px; }
+  .ct-center { padding: 96px 8px 30px; gap: 12px; }
+  .ct-status { min-width: 0; width: 100%; max-width: none; order: 3; }
+  .ct-seat { min-width: 0; padding: 6px 8px; }
+  .ct-nm { max-width: 72px; font-size: .85rem; }
+  .ct-fan { height: 28px; }
+  .ct-mini { width: 18px; margin-left: -11px; }
+  .pos-left { left: 6px; top: 8px; transform: none; }
+  .pos-right { right: 6px; top: 8px; left: auto; transform: none; }
+  .pos-top-left { left: 6px; transform: none; }
+  .pos-top-right { left: auto; right: 6px; transform: none; }
+  .pos-top { top: 8px; }
+}

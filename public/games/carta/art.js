@@ -1,5 +1,95 @@
 /* Card artwork, avatars and sounds — shared by the client. */
 (function () {
+  // SVG definitions used by the card art (suits, zellige pattern, star, fez)
+  const DEFS = `<defs>
+      <linearGradient id="g-gold" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#f7dc7a"/><stop offset=".55" stop-color="#d9ab2e"/><stop offset="1" stop-color="#a87510"/>
+      </linearGradient>
+      <linearGradient id="g-steel" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#e9f0f8"/><stop offset=".5" stop-color="#a9bdd4"/><stop offset="1" stop-color="#6f8db0"/>
+      </linearGradient>
+      <linearGradient id="g-cup" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#d63a3f"/><stop offset=".6" stop-color="#b3202a"/><stop offset="1" stop-color="#7f121a"/>
+      </linearGradient>
+      <linearGradient id="g-wood" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#b47a43"/><stop offset=".6" stop-color="#8b5a2b"/><stop offset="1" stop-color="#5e3a18"/>
+      </linearGradient>
+
+      <!-- 8-pointed Moroccan star (khatam) centred on 0,0 with radius ~10 -->
+      <symbol id="star8" viewBox="-10 -10 20 20" overflow="visible">
+        <rect x="-7" y="-7" width="14" height="14"/>
+        <rect x="-7" y="-7" width="14" height="14" transform="rotate(45)"/>
+      </symbol>
+
+      <!-- Zellige tile pattern for card backs -->
+      <pattern id="zellige" width="24" height="24" patternUnits="userSpaceOnUse">
+        <rect width="24" height="24" fill="#8e1b22"/>
+        <g transform="translate(12 12)" fill="#0f5132" stroke="#e2b54a" stroke-width=".8">
+          <rect x="-6" y="-6" width="12" height="12"/>
+          <rect x="-6" y="-6" width="12" height="12" transform="rotate(45)"/>
+        </g>
+        <circle cx="12" cy="12" r="2.2" fill="#f4e7c8"/>
+        <g fill="#f4e7c8">
+          <path d="M0 -3 L3 0 L0 3 L-3 0Z"/><path d="M24 -3 L27 0 L24 3 L21 0Z"/>
+          <path d="M0 21 L3 24 L0 27 L-3 24Z"/><path d="M24 21 L27 24 L24 27 L21 24Z"/>
+        </g>
+      </pattern>
+
+      <!-- Suits in the traditional Spanish-deck style (flat red / blue / yellow / green) -->
+      <symbol id="s-dheb" viewBox="-20 -20 40 40">
+        <circle r="18.5" fill="#f4c20d" stroke="#1a1a1a" stroke-width="1.2"/>
+        <circle r="15.5" fill="none" stroke="#d4231c" stroke-width="1.4"/>
+        <circle r="13" fill="#f7d54a" stroke="#1a1a1a" stroke-width=".6"/>
+        <g fill="#f4c20d" stroke="#d4231c" stroke-width=".9">
+          <ellipse cx="0" cy="-7" rx="3.2" ry="5.6"/><ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(45)"/>
+          <ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(90)"/><ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(135)"/>
+          <ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(180)"/><ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(225)"/>
+          <ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(270)"/><ellipse cx="0" cy="-7" rx="3.2" ry="5.6" transform="rotate(315)"/>
+        </g>
+        <circle r="3.6" fill="#d4231c" stroke="#1a1a1a" stroke-width=".6"/>
+        <circle r="1.3" fill="#f4c20d"/>
+      </symbol>
+      <symbol id="s-kass" viewBox="-20 -20 40 40">
+        <path d="M-14 -13 Q-14 3 -3 5.5 L-3 9 Q-10 11 -11.5 18 L11.5 18 Q10 11 3 9 L3 5.5 Q14 3 14 -13Z" fill="#f4c20d" stroke="#1a1a1a" stroke-width="1.1"/>
+        <path d="M-13.8 -8 L13.8 -8 Q13.6 -4.5 12.8 -2.5 L-12.8 -2.5 Q-13.6 -4.5 -13.8 -8Z" fill="#d4231c"/>
+        <path d="M-10 1.6 L10 1.6 Q7 4.5 3 5.5 L-3 5.5 Q-7 4.5 -10 1.6Z" fill="#1d5bb5"/>
+        <ellipse cx="0" cy="-13" rx="14" ry="3.4" fill="#1d5bb5" stroke="#1a1a1a" stroke-width="1"/>
+        <ellipse cx="0" cy="-13" rx="10" ry="1.6" fill="#0f3d80"/>
+        <ellipse cx="0" cy="7.4" rx="5" ry="2" fill="#d4231c" stroke="#1a1a1a" stroke-width=".7"/>
+        <path d="M-10.6 14.5 L10.6 14.5 L11.5 18 L-11.5 18Z" fill="#1d5bb5" stroke="#1a1a1a" stroke-width=".7"/>
+      </symbol>
+      <symbol id="s-syouf" viewBox="-8 -26 16 52">
+        <path d="M0 -25.5 L2.7 -19 L2.7 11.5 L-2.7 11.5 L-2.7 -19Z" fill="#1d5bb5" stroke="#1a1a1a" stroke-width=".8"/>
+        <path d="M0 -22 L0 10.5" stroke="#8fb5e8" stroke-width="1"/>
+        <path d="M-7.6 11.3 Q0 14.6 7.6 11.3 L7.6 14.4 Q0 17.6 -7.6 14.4Z" fill="#f4c20d" stroke="#1a1a1a" stroke-width=".7"/>
+        <rect x="-1.9" y="15.8" width="3.8" height="6" fill="#d4231c" stroke="#1a1a1a" stroke-width=".5"/>
+        <circle cy="23.2" r="2.4" fill="#f4c20d" stroke="#1a1a1a" stroke-width=".6"/>
+      </symbol>
+      <symbol id="s-zrawet" viewBox="-8 -26 16 52">
+        <g stroke="#1a1a1a" stroke-width=".6">
+          <path d="M-4.6 -6 L-7.2 -8.4 L-6 -4.4Z M4.4 2 L7.2 0 L5.8 4.2Z M-4 11 L-6.8 9.4 L-5.4 13.2Z" fill="#f4c20d"/>
+          <ellipse cx="-7.3" cy="-10" rx="1.2" ry="2.2" fill="#2f8f3e" transform="rotate(-25 -7.3 -10)"/>
+          <ellipse cx="7.4" cy="-1.8" rx="1.2" ry="2.2" fill="#2f8f3e" transform="rotate(25 7.4 -1.8)"/>
+        </g>
+        <path d="M-2.6 25 L-4.4 -14 Q-7 -22 0 -25.6 Q7 -22 4.4 -14 L2.6 25Z" style="fill: var(--club, #2f8f3e)" stroke="#1a1a1a" stroke-width=".9"/>
+        <path d="M-3.9 -14.5 Q0 -12.6 3.9 -14.5 M-3.5 -1 Q0 1 3.5 -1 M-3 12 Q0 13.8 3 12" stroke="#1a1a1a" stroke-width=".6" fill="none"/>
+        <path d="M-1.4 -22 Q-2.6 -10 -1.2 22" stroke="#fff" stroke-opacity=".45" stroke-width="1" fill="none"/>
+      </symbol>
+
+      <!-- Fez (tarbouch) for computer players -->
+      <symbol id="fez" viewBox="0 0 40 40">
+        <path d="M11 30 L14 10 Q20 7 26 10 L29 30 Q20 33 11 30Z" fill="#b3202a" stroke="#6e1016" stroke-width="1.2"/>
+        <ellipse cx="20" cy="10" rx="6" ry="1.8" fill="#8e1b22"/>
+        <path d="M20 9 Q25 12 26 22" stroke="#1b1b1b" stroke-width="1.4" fill="none"/>
+        <path d="M24.5 20 L27.5 20 L28 26 L24 26Z" fill="#1b1b1b"/>
+      </symbol>
+    </defs>`;
+  if (!document.getElementById('carta-defs')) {
+    const holder = document.createElement('div');
+    holder.innerHTML = `<svg id="carta-defs" class="svg-defs" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">${DEFS}</svg>`;
+    document.body.prepend(holder.firstChild);
+  }
+
   const SUITS = {
     dheb:   { label: 'Dheb',   ar: 'ذهب',   color: '#b8860b', gaps: 0 },
     kass:   { label: 'Kass',   ar: 'كاس',   color: '#d4231c', gaps: 1 },

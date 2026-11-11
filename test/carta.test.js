@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const g = require('../server/game');
+const g = require('../server/games/carta-engine');
 
 const players = [{ id: 'a', name: 'A' }, { id: 'b', name: 'B' }, { id: 'c', name: 'C' }];
 const card = (rank, suit) => ({ id: `${rank}-${suit}`, rank, suit });
